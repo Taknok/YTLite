@@ -1,0 +1,97 @@
+name: Update AltStore Source
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  update-altstore:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get IPA asset URL
+        id: get_asset
+        run: |
+          IPA_URL=$(jq -r '.release.assets[] | select(.name | endswith(".ipa")) | .browser_download_url' <<< '${{ toJson(github.event) }}')
+          IPA_NAME=$(jq -r '.release.assets[] | select(.name | endswith(".ipa")) | .name' <<< '${{ toJson(github.event) }}')
+
+          echo "ipa_url=$IPA_URL" >> $GITHUB_OUTPUT
+          echo "ipa_name=$IPA_NAME" >> $GITHUB_OUTPUT
+
+      - name: Download IPA
+        run: |
+          curl -L "${{ steps.get_asset.outputs.ipa_url }}" -o app.ipa
+
+      - name: Extract Info.plist from IPA
+        run: |
+          unzip -q app.ipa
+          APP_PATH=$(find Payload -name "*.app" -type d | head -n 1)
+          cp "$APP_PATH/Info.plist" Info.plist
+
+      - name: Read version from Info.plist
+        id: plist
+        run: |
+          python3 << 'EOF'
+          import plistlib
+
+          with open("Info.plist", "rb") as f:
+              plist = plistlib.load(f)
+
+          version = plist.get("CFBundleShortVersionString", "")
+          build = plist.get("CFBundleVersion", "")
+
+          print(f"version={version}")
+          print(f"build={build}")
+
+          with open("version.txt","w") as f:
+              f.write(version)
+          with open("build.txt","w") as f:
+              f.write(build)
+          EOF
+
+          echo "version=$(cat version.txt)" >> $GITHUB_OUTPUT
+          echo "build=$(cat build.txt)" >> $GITHUB_OUTPUT
+
+      - name: Get IPA size
+        id: size
+        run: |
+          SIZE=$(stat -c%s app.ipa)
+          echo "size=$SIZE" >> $GITHUB_OUTPUT
+
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - name: Update app.json
+        run: |
+          VERSION="${{ steps.plist.outputs.version }}"
+          DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          URL="${{ steps.get_asset.outputs.ipa_url }}"
+          SIZE="${{ steps.size.outputs.size }}"
+
+          jq \
+            --arg version "$VERSION" \
+            --arg date "$DATE" \
+            --arg url "$URL" \
+            --argjson size "$SIZE" \
+            '
+            (.apps[0].versions[0].version) = $version |
+            (.apps[0].versions[0].date) = $date |
+            (.apps[0].versions[0].downloadURL) = $url |
+            (.apps[0].versions[0].size) = $size
+            ' app.json > tmp.json
+
+          mv tmp.json app.json
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add app.json
+          git commit -m "Update AltStore source to ${{ steps.plist.outputs.version }}"
+          git push
