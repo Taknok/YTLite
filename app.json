@@ -1,37 +1,24 @@
 {
   "name": "FRIT-e",
-  "subtitle": "",
-  "description": "",
   "iconURL": "https://i.imgur.com/pqIZoZo.jpeg",
-  "website": "",
-  "patreonURL": "",
   "tintColor": "#FFA500",
-  "featuredApps": [],
   "apps": [
     {
       "name": "YouTube",
       "bundleIdentifier": "com.google.ios.youtube",
-      "marketplaceID": "",
       "developerName": "Some1",
-      "subtitle": "",
-      "localizedDescription": "",
       "iconURL": "https://i.imgur.com/YGaBaEB.png",
       "tintColor": "#fc0434",
       "category": "entertainment",
-      "screenshots": [],
       "versions": [
         {
           "downloadURL": "https://github.com/Taknok/YTLite/releases/download/ytp-3/YouTubePlus_5.2b4.ipa",
           "size": 128839183,
           "version": "21.09.2",
-          "buildVersion": null,
           "date": "2026-03-07T18:48:10Z",
-          "localizedDescription": null,
-          "minOSVersion": null
         }
       ],
       "appPermissions": {
-        "entitlements": [],
         "privacy": {
           "NSCameraUsageDescription": "This lets you create videos using the app.",
           "NSUserTrackingUsageDescription": "To personalize ads and provide ad measurement, YouTube will link activity from this app with activity from non-Google apps and websites.",
@@ -44,8 +31,6 @@
           "NSPhotoLibraryUsageDescription": "This lets you upload media you've already created."
         }
       },
-      "patreon": {}
     }
   ],
-  "news": []
 }
