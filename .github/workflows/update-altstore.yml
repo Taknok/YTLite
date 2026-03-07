@@ -21,11 +21,15 @@ jobs:
       - name: Get IPA asset URL
         id: get_asset
         run: |
-          IPA_URL=$(jq -r '.release.assets[] | select(.name | endswith(".ipa")) | .browser_download_url' <<< '${{ toJson(github.event) }}')
-          IPA_NAME=$(jq -r '.release.assets[] | select(.name | endswith(".ipa")) | .name' <<< '${{ toJson(github.event) }}')
+          if [ "${{ github.event_name }}" = "release" ]; then
+            JSON='${{ toJson(github.event.release.assets) }}'
+          else
+            JSON=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest | jq '.assets')
+          fi
+
+          IPA_URL=$(echo "$JSON" | jq -r '.[] | select(.name | endswith(".ipa")) | .browser_download_url')
 
           echo "ipa_url=$IPA_URL" >> $GITHUB_OUTPUT
-          echo "ipa_name=$IPA_NAME" >> $GITHUB_OUTPUT
 
       - name: Download IPA
         run: |
