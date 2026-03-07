@@ -7,6 +7,7 @@
       "name": "YouTube",
       "bundleIdentifier": "com.google.ios.youtube",
       "developerName": "Some1",
+      "localizedDescription": "",
       "iconURL": "https://i.imgur.com/YGaBaEB.png",
       "tintColor": "#fc0434",
       "category": "entertainment",
