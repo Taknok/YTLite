@@ -13,10 +13,10 @@
       "category": "entertainment",
       "versions": [
         {
-          "downloadURL": "https://github.com/Taknok/YTLite/releases/download/ytp-4/YouTubePlus_5.2b4.ipa",
-          "size": 128839183,
-          "version": "21.09.2",
-          "date": "2026-03-07T18:48:10Z"
+          "downloadURL": "https://github.com/Taknok/YTLite/releases/download/ytp-5/YouTubePlus_5.2.1.ipa",
+          "size": 133092239,
+          "version": "21.18.4",
+          "date": "2026-05-15T21:38:16Z"
         }
       ],
       "appPermissions": {
